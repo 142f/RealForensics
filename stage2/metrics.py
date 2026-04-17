@@ -27,17 +27,9 @@ class VideoLevelAUROC(Metric):
             pos_label=None,
             average='macro',
             max_fpr=None,
-            compute_on_step=True,
-            dist_sync_on_step=False,
-            process_group=None,
-            dist_sync_fn=None,
+            **kwargs
     ):
-        super().__init__(
-            compute_on_step=compute_on_step,
-            dist_sync_on_step=dist_sync_on_step,
-            process_group=process_group,
-            dist_sync_fn=dist_sync_fn,
-        )
+        super().__init__()
 
         self.num_classes = num_classes
         self.pos_label = pos_label
@@ -76,7 +68,7 @@ class VideoLevelAUROC(Metric):
         preds = torch.stack(
             [torch.mean(torch.stack(pred_list), 0, keepdim=False) for pred_list in preds_per_vid.values()]).squeeze(1)
         targets = torch.stack([label for label in targets_per_vid.values()])
-        return preds, targets
+        return preds.cpu(), targets.cpu()
 
     def update(self, preds, targets, video_idxs, ds_type):
         """
@@ -338,17 +330,9 @@ class VideoLevelAcc(Metric):
     def __init__(
             self,
             ds_types,
-            compute_on_step=True,
-            dist_sync_on_step=False,
-            process_group=None,
-            dist_sync_fn=None,
+            **kwargs
     ):
-        super().__init__(
-            compute_on_step=compute_on_step,
-            dist_sync_on_step=dist_sync_on_step,
-            process_group=process_group,
-            dist_sync_fn=dist_sync_fn,
-        )
+        super().__init__()
 
         self.ds_types = ds_types
         for ds_type in ds_types:
